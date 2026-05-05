@@ -2,3 +2,40 @@ bin/
 obj/
 *.log
 appsettings.Development.json
+.vs/
+bin/
+obj/
+*.log
+appsettings.Development.json
+# Build outputs
+bin/
+obj/
+
+# IDE folders
+.vs/
+.idea/
+
+# Log files (created at runtime)
+*.log
+error.log
+weather.log
+
+# Configuration with secrets — ignore ONLY the ones with real keys
+appsettings.Development.json
+appsettings.Production.json
+*.Development.json
+*.Production.json
+
+# But keep the example file and the default template
+!appsettings.json
+!appsettings.example.json
+
+# User-specific files
+*.user
+*.suo
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+*.exe
