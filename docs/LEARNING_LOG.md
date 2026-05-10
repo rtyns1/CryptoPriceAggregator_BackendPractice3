@@ -2,7 +2,9 @@ First of all, we need to understand what the problem is about.
 # Challenge: Resilient Cryptocurrency Price Aggregator (Long)
 
 ## Objective
-Build a console app that fetches the current Bitcoin (BTC) price in USD from **two different public APIs** simultaneously, compares the results, and implements both a **manual circuit breaker** (state machine, thread‑safe) and a **Polly refactor**. You must use defensive programming, structured logging, configuration files, and parallel asynchronous calls.
+Build a console app that fetches the current Bitcoin (BTC) price in USD from **two different public APIs** simultaneously, compares the results, 
+and implements both a **manual circuit breaker** (state machine, thread‑safe) and a **Polly refactor**.
+You must use defensive programming, structured logging, configuration files, and parallel asynchronous calls.
 
 ## Core Concepts Tested (from previous projects)
 - Async/await, `HttpClient` as singleton.
@@ -148,3 +150,18 @@ Now, once i have a clear set like this, i need to device a paln.
 Come up with a path to follow for the implementation, how code builds upon each other and dependancy.
 
 ** Next time, we talk of dependancies and flow of code as well as separation of responsibilities. **
+
+----------------------
+FROM THIS POINT FORWARDS, IM RECORDING WHAT IVE BEEN CODING:::
+-- Helpers come first.
+--Filelogger and JsonLogger are independent , so they can be implemented first.
+-- Jsonlogger is used for structured events, so it will be used in the circuit breaker and services for logging warnings and errors.
+-- Some examples of structured events are API price discrepancies, circuit breaker state changes, and exceptions with contextual information.
+-- Now, the filelogger is for logging plani text errors,so it will be used for logging exceptions that occur during the API calls and JSON parsing in the service.
+-- IN simple terms, the filelogger is for error loggnig, while the jsonLogger is for structured event loggint , like warnings and state changes,
+-- ConfigurationHelper is used for loading values from appsettings.json , and it will be used in the services to get API URLs and other settins, so it should be implemented first in the service folder.
+-- The services (coinGeckoService snd CoinCapService) depend on the loggers and the configuration helper, so they will be implemented after those.
+
+--Set filelogger and jsonlogger first, then the appsettings.json and appsettings,Development,json and then set up the configurations helper.
+-- After this, i will write the circuit breaker and then the API services. Constant testing throughout.
+
