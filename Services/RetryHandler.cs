@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AsyncDataAggregator__Backend_practice_1.Services
+namespace CryptoPriceAggregator_BackendPractice3.Services
 {
     public class RetryHandler
     {

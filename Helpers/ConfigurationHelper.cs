@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Runtime.ExceptionServices;
 
 /*
  * Need to download a few packages to work with configuration
@@ -15,57 +16,59 @@ using System.Runtime.InteropServices;
  * Microsoft.Extensions.Configuration.Binder
  * using System.Threading
  */
-namespace ResilientWeatherGateway_Backend_Practice_2.Helpers
+namespace CryptoPriceAggregator_BackendPractice3.Helpers
 {
     public class ConfigurationHelper
     {
-        //Config = appsettings.json + appsettings.Development.json + code that reads them.
-        // It is configuring which API to call, Base URL, it is configuring my API key, and which city to query.
-        // These are things that change without recompiling.
+        // need to understand why we need this class, why its needed, and then how to write it and how to write it well
+        // thic class is responsible for reading settings from external sourseces and providing thrm to the rest of the application ni a stronyl types, easy to use way
         /*
+         * It Loads config files::-uses ConfigurationBuilder to read appsettings.json (base) and optionally environment specific files like appsettings.Development.json
+         * It merges settings frmo multiple sources -- values fromt he environment specific file override the base file.
+         * Exposes values -- it provides methods like GetValue<T> or properties so that other classes can access settings without knowingh where they came from.
+         * Centralises configuration -- instead of scattering hardcoded strings across your code, you have one place that manages all settings.
+         * It is needed and essential for separation of concerns-- business logic/service does not need to know about file paths, JSON parsing, or which environment you are running
+         * also, resusab;e
          * 
-         * Create a new ConfigurationBuilder
-          Set the base path to the current directory (where your .exe runs)
-          Call .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-          Call .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
-          Call .Build() to create the IConfiguration object
-           Call .Build() to create the IConfiguration object
-           Store this IConfiguration object in a field/property
+         * So, now before i write it, i need to atleast have an idea of the methods i should expect it to have and some pseudocode
+         * 
          */
 
-        private readonly IConfiguration? _configuration;//This field will hold all the settings after they are loaded
+        private readonly IConfiguration? _configuration; // this is where the settings will be stored after being loaded from the files
+        // this is standard, bcz IConfiguration is the interface provided by Microsoft.Extensions.Configuration, and it allows us to access configuration values in a consistent way, regardless of the source.
+        // private and readonly bcz we only want this field to be set once, and only within this class.
+        // we need a constructor to load the configuration when an instance of this class is created
 
-        //need a constructor--to build the configuration object and store it in the feld
-
-        public ConfigurationHelper()// should not take any paremeters
+        public ConfigurationHelper()
         {
-            // constructor is the only place that builds the configurtion.
-            //Once it is built, it is stored in _configuration and never rebuilt again
-            // Rough guide on the implementation:
-            // create a new configuration builder
-            // set its base path to the current directory(Directory.GetCurrentDirectory())
-            // Add the JSON file "appsettings.json" required - if missng, crash
-            // Add the JSON file "appsettings.Development.json" optional- if its missing, ignore
-            //Build the configuration
-            //store the configuration in the _configuration field
-
             _configuration = new ConfigurationBuilder()
-               .SetBasePath(Directory.GetCurrentDirectory())
-               .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-               .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
-               .Build();
+                   .SetBasePath(Directory.GetCurrentDirectory())
+                   .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                   .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+                   .Build();
+            // the section above is called a fluent interface - it is chaining method calls together. Each method call returns the same object, so we can call another method on it immediately.
+            // We could also write it in a ismpler way:
+            // var builder = new ConfigurationBuilder():
+            // builder.SetBasePath(Directory.GetCurrentDirectory()):
+            // builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange : true):
+            // builder.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange : true):
+            // _configuration = builder.Build();
+            // But the fluent interface is more concise and easier to read .
+            // the details on how to write this are in the Microsoft Documentation for ConfigurationBuilder
         }
-        public T GetValue<T>(string key)
+
+        public T GetValue<T>(string Key)
         {
-
-            return _configuration.GetValue<T>(key);
+            return _configuration.GetValue<T>(Key);
         }
 
-        public IConfigurationSection GetSection(string key)
+        public IConfigurationSection GetSection(String SectionName)
         {
-            return _configuration.GetSection(key);
+            return _configuration.GetSection(SectionName);
         }
 
+        // All of these are in the Microsoft Documentation for ConfigurationBuilder.
+        // 
     }
 }
 
