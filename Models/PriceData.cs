@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CryptoPriceAggregator_BackendPractice3Models
+namespace CryptoPriceAggregator_BackendPractice3.Models
 {
     public class PriceData
     {

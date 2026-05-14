@@ -16,6 +16,7 @@ using System.Runtime.ExceptionServices;
  * Microsoft.Extensions.Configuration.Binder
  * using System.Threading
  */
+
 namespace CryptoPriceAggregator_BackendPractice3.Helpers
 {
     public class ConfigurationHelper

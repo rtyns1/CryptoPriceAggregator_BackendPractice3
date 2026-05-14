@@ -165,3 +165,19 @@ FROM THIS POINT FORWARDS, IM RECORDING WHAT IVE BEEN CODING:::
 --Set filelogger and jsonlogger first, then the appsettings.json and appsettings,Development,json and then set up the configurations helper.
 -- After this, i will write the circuit breaker and then the API services. Constant testing throughout.
 
+
+
+-- So the approach ime taking is simple, first make the program run with the http client , then add the retry handler and then now add the manual circuit brekaer, thsiw way i will understand the layers better.
+The classes themselves (RetryHandler and CircuitBreaker) are generic – they work for any delegate. You can (and should) test them in isolation using fake delegates. That you have already done in the weather project.
+
+What I meant by order is integration into the crypto service:
+
+First, write CoinGeckoService without any resilience (direct HttpClient). This ensures your URL building and JSON parsing are correct for that specific API. You test it with a real API call. 
+This step is specific to the crypto project – it's not about the generic classes.
+
+Then, add the retry handler inside the service. You wrap the HTTP call with RetryHandler.ExecuteWithRetry. This tests that your retry logic works with the real API.
+
+Then, add the circuit breaker around the retry handler. You wrap the whole thing with _circuitBreaker.ExecuteAsync.
+
+Even though the classes are generic, the integration still needs to be done step by step to isolate bugs. If you add both at once and the API returns 404,
+you wouldn't know if it's a URL problem or a breaker/retry misconfiguration.
