@@ -35,10 +35,10 @@ namespace CryptoPriceAggregator_BackendPractice3.Services
                 // what do i need?
                 // for CoinCap service, it is ::$"{_baseUrl}/{symbol.ToLower()}?apiKey={_apiKey}"
                 // URL construction for Coinggesko is different-- u need to read the docs because every API has a differnnt URL pattern.
-                // but fo coingecko, its something like this::https://pro-api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=bitcoin
+                // but fo coingecko, its something like this::https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=bitcoin
                 // now, from this i need to construct the URL, 
                 // first, identify the base URL and the key parameters
-                //Base URL is : https://pro-api.coingecko.com/api/v3/simple/price
+                //Base URL is : https://api.coingecko.com/api/v3/simple/price
                 // key parameters here are vs_currencies and ids, where vs_currencies is the currency we wan which is USD, and ids is the crypto symbol in lowercase so we say symbol.ToLower()
                 // start with base url "{_baseUrl}"
                 // append the ? character to indicate the start of query parameters-- thisis dtandard in URL construction
@@ -47,7 +47,7 @@ namespace CryptoPriceAggregator_BackendPractice3.Services
                 // append the & to separate paarameters
                 // append te new vs_currencies parameter which is "vs_currencies" = usd
 
-                string url = $"{_baseUrl}?ids={symbol.ToLower()}&vs_currencies= usd";
+                string url = $"{_baseUrl}?ids={symbol.ToLower()}&vs_currencies=usd&x_cg_demo_api_key={_apiKey}";
                 string JsonString = await _httpClient.GetStringAsync(url);
 
                 if (string.IsNullOrWhiteSpace(JsonString))
@@ -57,18 +57,18 @@ namespace CryptoPriceAggregator_BackendPractice3.Services
 
                 using JsonDocument doc = JsonDocument.Parse(JsonString);
                 JsonElement root = doc.RootElement;
-                JsonElement data = root.GetProperty("bitcoin");
+                JsonElement data = root.GetProperty(symbol.ToLower());
 
                 if (data.TryGetProperty("usd", out JsonElement priceElement))// does CoinGecko API use data?
                 {
-                    string priceString = priceElement.GetString();
-                    if (decimal.TryParse(priceString, out decimal price ))
+                    decimal price = priceElement.GetDecimal();
+                    if (decimal.TryParse(price.ToString(), out decimal priceString ))
                     {
                         return price;
                     }
                     else
                     {
-                        throw new Exception($"failed to parse price from CoinGecko response: {priceString}"); ;
+                        throw new Exception($"failed to parse price from CoinGecko response: {priceString}");
                     }
                 }
                 else
@@ -78,8 +78,8 @@ namespace CryptoPriceAggregator_BackendPractice3.Services
             }
             catch (HttpRequestException ex)
             {
-                await FileLogger.LogErrorAsync($"CoipCapAPIservice HTTP request failed: {ex.Message}");
-                throw new Exception($"Failed to call CoinCapService: {ex.Message}", ex);
+                await FileLogger.LogErrorAsync($"CoinGeckoAPIservice HTTP request failed: {ex.Message}");
+                throw new Exception($"Failed to call CoinGeckoService: {ex.Message}", ex);
             }
 
             catch (JsonException ex)
